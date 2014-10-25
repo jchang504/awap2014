@@ -206,6 +206,11 @@ class Game:
     # find_move will be called and you must return where to go.
     # You must return a tuple (block index, # rotations, x, y)
     def find_move(self):
+        move, score = minimax(grid, bonus_squares, 4, eval_fn = heuristic1, # heuristic1(grid, bonus_squares, player_number):
+                            get_next_moves_fn = get_next_moves,
+                            player_number = 0, verbose = False)
+        return move
+        '''
         moves = []
         N = self.dimension
         for index, block in enumerate(self.blocks):
@@ -218,31 +223,7 @@ class Game:
                     if self.can_place(new_block, Point(x, y)):
                         return (index, rotations, x, y)
 
-        return (0, 0, 0, 0)
-
-<<<<<<< HEAD
-    # Minimax search
-    def minimax(board, depth, eval_fn = simon_evaluate,
-            get_next_moves_fn = get_all_next_moves,
-            turn = 0, is_terminal_fn = is_terminal,
-            verbose = True):
-
-    
-    best_val = None
-    
-    for move, new_board in get_next_moves_fn(board):
-        val = -1 * minimax_find_board_value(new_board, depth-1, eval_fn,
-                                            get_next_moves_fn,
-                                            is_terminal_fn)
-        if best_val == None or val > best_val[0]:
-            best_val = (val, move, new_board)
-            
-    if verbose:
-        print "MINIMAX: Decided on column %d with rating %d" % (best_val[1], best_val[0])
-
-    return best_val[1]
-
-    
+        return (0, 0, 0, 0)  '''  
 
     # Checks if a block can be placed at the given point
     def can_place(self, block, point):
@@ -307,15 +288,10 @@ class Game:
         return self.turn == self.my_number
 
 
-# Board heuristic function
-def simon_evaluate(board, player_number):
-    return 0
-
-
 # Minimax search
-def minimax(grid, depth, eval_fn = simon_evaluate,
-        get_next_moves_fn = get_all_next_moves,
-        player_number = 0, verbose = True):
+def minimax(grid, bonus_squares, depth, eval_fn = heuristic1, # heuristic1(grid, bonus_squares, player_number):
+            get_next_moves_fn = get_next_moves,
+            player_number = 0, verbose = True):
     """
     Do a minimax search to the specified depth on the specified board.
 
@@ -330,7 +306,7 @@ def minimax(grid, depth, eval_fn = simon_evaluate,
     next_moves = get_next_moves_fn(board, player_number)
 
     if depth == 0: # If at the leaf, evaluate.
-        return (None, [eval_fn(grid, p) for p in range(4)])
+        return (None, [eval_fn(grid, bonus_squares, p) for p in range(4)])
     
     if len(next_moves) == 0: # Can't move anywhere; essentially skips the turn.
         # Evaluate next player's moves
