@@ -66,6 +66,31 @@ class Game:
 
         return (0, 0, 0, 0)
 
+    # Minimax search
+    def minimax(board, depth, eval_fn = simon_evaluate,
+            get_next_moves_fn = get_all_next_moves,
+            turn = 0, is_terminal_fn = is_terminal,
+            verbose = True):
+
+    
+    best_val = None
+    
+    for move, new_board in get_next_moves_fn(board):
+        val = -1 * minimax_find_board_value(new_board, depth-1, eval_fn,
+                                            get_next_moves_fn,
+                                            is_terminal_fn)
+        if best_val == None or val > best_val[0]:
+            best_val = (val, move, new_board)
+            
+    if verbose:
+        print "MINIMAX: Decided on column %d with rating %d" % (best_val[1], best_val[0])
+
+    return best_val[1]
+
+    # Board heuristic function
+    def simon_evaluate(board, player_number):
+        return 0
+
     # Checks if a block can be placed at the given point
     def can_place(self, block, point):
         onAbsCorner = False
