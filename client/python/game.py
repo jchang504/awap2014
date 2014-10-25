@@ -58,6 +58,7 @@ def connected_squares(square, player_number):
             adjacent_to_point.append(Point(x,y+1))
         if y - 1 >= 0:
             adjacent_to_point.append(Point(x,y-1))
+        return adjacent_to_point
 
 
     visited = []
@@ -85,17 +86,32 @@ def connected_squares(square, player_number):
 # going up, down, left, and right is in the same block
 def score(grid, bonus_squares, player_number):
     # Find number of squares in blocks containing dogecoins
+    score = 0
     dogecoin_multiplier = 3
+    number_squares_receiving_multiplier = 0;
+
     dogecoin_points_covered_by_player = []
     for dogecoin_point in bonus_squares:
         if grid[dogecoin_point.x][dogecoin_point.y] == player_number:
             dogecoin_points_covered_by_player.append(dogecoin_point)
 
-    return 0
+    for square in dogecoin_points_covered_by_player: 
+        for connected_square in connected_squares(square):
+            number_squares_receiving_multiplier += 1
+
+    # Find total number of squares covered by player
+    total_player_squares = 0
+    for i in range(20):
+        for j in range(20):
+            if grid[i][j] == player_number:
+                total_player_squares += 1
+
+    # Compute final score 
+    return dogecoin_multiplier*number_squares_receiving_multiplier + (total_player_squares - number_squares_receiving_multiplier)
 
 
     
-
+# still need to implement helper function to count number of corners available
 
 
 
