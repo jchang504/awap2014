@@ -358,7 +358,7 @@ def minimax(grid, blocks, bonus_squares, depth, eval_fn = heuristic1, # heuristi
             best = (move, new_score)
 
         # Unplay move. grid should now be back to original.
-        unplay(grid, block, Point(move[2],move[3]), blocks)
+        unplay(grid, block_played, Point(move[2],move[3]), blocks)
         
     if verbose:
         print "MINIMAX: Decided on move %d with rating %d" % (best[0], best[1])
