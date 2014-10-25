@@ -37,6 +37,82 @@ class Point:
     def distance(self, point):
         return abs(point.x - self.x) + abs(point.y - self.y)
 
+# Given that square (a Point object) is owned by 
+# the player player_number, this function returns all of the
+# squares in the same connected component (or all squares in
+# the same block) as square. The output is a list of Points.
+def connected_squares(square, player_number):
+
+    # Returns list of points on the board adjacent
+    # to point
+    def adjacent_to(point):
+        x = point.x
+        y = point.y
+        adjacent_to_point = []
+        if x + 1 <= 19:
+            adjacent_to_point.append(Point(x+1,y))
+        if x - 1 >= 0:
+            adjacent_to_point.append(Point(x-1,y))
+        if y + 1 <= 19:
+            adjacent_to_point.append(Point(x,y+1))
+        if y - 1 >= 0:
+            adjacent_to_point.append(Point(x,y-1))
+
+
+    visited = []
+    stack = [square]
+    while len(stack) > 0:
+        top_vertex = stack.pop(len(stack)-1)
+        children = adjacent_to(top_vertex)
+        for child in children:
+            if child not in visited:
+                stack.append(child)
+        visited.append(top_vertex)
+    return visited
+
+
+
+
+
+
+
+
+# Returns the player's score on a given board
+# bonus_squares is list of Points
+# rep invariant: the pieces are arranged according to blokus rules
+# in particular everything reachable from a square in a given block
+# going up, down, left, and right is in the same block
+def score(grid, bonus_squares, player_number):
+    # Find number of squares in blocks containing dogecoins
+    dogecoin_multiplier = 3
+    dogecoin_points_covered_by_player = []
+    for dogecoin_point in bonus_squares:
+        if grid[dogecoin_point.x][dogecoin_point.y] == player_number:
+            dogecoin_points_covered_by_player.append(dogecoin_point)
+
+    return 0
+
+
+    
+
+
+
+
+# Simple heuristic
+# grid is list of lists (20x20) representing the board, with the following entries:
+# -2 - crater
+# -1 - empty
+# 0 - player 1 block
+# 1 - player 2 block
+# 2 - player 3 block
+# 3 - player 4 block
+# Score is linear combination of current score and number of free corners
+def heuristic1(grid, bonus_squares, player_number):
+    a_1 = 1
+    a_2 = 1
+
+    return 0
+
 class Game:
     blocks = []
     grid = []
@@ -87,9 +163,7 @@ class Game:
 
     return best_val[1]
 
-    # Board heuristic function
-    def simon_evaluate(board, player_number):
-        return 0
+    
 
     # Checks if a block can be placed at the given point
     def can_place(self, block, point):
@@ -171,5 +245,9 @@ def main():
         state = get_state()
         game.interpret_data(state)
 
+
+
+
 if __name__ == "__main__":
     main()
+
