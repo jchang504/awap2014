@@ -211,7 +211,7 @@ class Game:
     def find_move(self):
         move, score = minimax(self.grid, self.bonus_squares, 4, eval_fn = heuristic1, # heuristic1(grid, bonus_squares, player_number):
                             get_next_moves_fn = get_next_moves,
-                            self.my_number, verbose = False)
+                            player_number=self.my_number, verbose = False)
         return move
         '''
         moves = []
