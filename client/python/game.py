@@ -66,31 +66,6 @@ class Game:
 
         return (0, 0, 0, 0)
 
-    # Minimax search
-    def minimax(board, depth, eval_fn = simon_evaluate,
-            get_next_moves_fn = get_all_next_moves,
-            turn = 0, is_terminal_fn = is_terminal,
-            verbose = True):
-
-    
-    best_val = None
-    
-    for move, new_board in get_next_moves_fn(board):
-        val = -1 * minimax_find_board_value(new_board, depth-1, eval_fn,
-                                            get_next_moves_fn,
-                                            is_terminal_fn)
-        if best_val == None or val > best_val[0]:
-            best_val = (val, move, new_board)
-            
-    if verbose:
-        print "MINIMAX: Decided on column %d with rating %d" % (best_val[1], best_val[0])
-
-    return best_val[1]
-
-    # Board heuristic function
-    def simon_evaluate(board, player_number):
-        return 0
-
     # Checks if a block can be placed at the given point
     def can_place(self, block, point):
         onAbsCorner = False
@@ -152,6 +127,58 @@ class Game:
 
     def is_my_turn(self):
         return self.turn == self.my_number
+
+
+# Board heuristic function
+def simon_evaluate(board, player_number):
+    return 0
+
+
+# Minimax search
+def minimax(grid, depth, eval_fn = simon_evaluate,
+        get_next_moves_fn = get_all_next_moves,
+        player_number = 0, verbose = True):
+    """
+    Do a minimax search to the specified depth on the specified board.
+
+    board -- the 2D array board to evaluate. 
+    depth -- the depth of the search tree (measured in maximum distance from a leaf to the root)
+    eval_fn -- the evaluation function to use to give a value to a leaf of the tree
+
+    Returns (move, score). move and score are both 4-tuples. move is what we're interested in
+    """
+    
+    best = None
+    next_moves = get_next_moves_fn(board, player_number)
+
+    if depth == 0: # If at the leaf, evaluate.
+        return (None, [eval_fn(grid, p) for p in range(4)])
+    
+    if len(next_moves) == 0: # Can't move anywhere; essentially skips the turn.
+        # Evaluate next player's moves
+        new_move, new_score = minimax(grid, depth-1, eval_fn, get_next_moves_fn,
+                                        (player_number + 1)%4, verbose)
+        if best == None or new_score[player_number] > best[1][player_number]:
+            best = (move, new_score)
+        
+    for move in next_moves:
+        # Play move. grid should now be a different grid.
+        play(grid, player_number, move)
+
+        # Evaluate next player's moves.
+        new_move, new_score = minimax(grid, depth-1, eval_fn, get_next_moves_fn,
+                                        (player_number + 1)%4, verbose)
+        if best == None or new_score[player_number] > best[1][player_number]:
+            best = (move, new_score)
+
+        # Unplay move. grid should now be back to original.
+        unplay(grid, player_number, move)
+        
+    if verbose:
+        print "MINIMAX: Decided on move %d with rating %d" % (best[0], best[1])
+
+    return best
+
 
 def get_state():
     return json.loads(raw_input())
