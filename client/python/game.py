@@ -133,10 +133,19 @@ def heuristic1(grid, bonus_squares, player_number):
 
     for i in range(40):
         for j in range(40):
-            pass
+            if grid[i][j] == player_number:
+                if all([isEmpty(i+deltaI, j+deltaJ) for deltaI, deltaJ in [(1,0),(-1,0),(0,1),(0,-1)]])
+                    if any([isEmpty(i+deltaI, j+deltaJ) for deltaI, deltaJ in [(1,0),(-1,0),(0,1),(0,-1)]])
+                        num_corners += 1
 
+    
     return 0.1 * current_score + num_corners
     
+def isEmpty(i, j, grid):
+    return (i >= 0 and i < 20 and j >= 0 and j < 20 and grid[i][j] == -1)
+
+def isFilled(i, j, grid, player_number):
+    return (i >= 0 and i < 20 and j >= 0 and j < 20 and grid[i][j] == player_number)
 
 def play(grid, playerNumber, blocks, move):
     (block_index, num_rot, x, y) = move
