@@ -37,6 +37,66 @@ class Point:
     def distance(self, point):
         return abs(point.x - self.x) + abs(point.y - self.y)
 
+def play(grid, playerNumber, blocks, move):
+    (block_index, num_rot, x, y) = move
+    block_rot= [offset.rotate(num_rot) for offset in blocks[block_index]]
+    for (i,j) in block_rot:
+        grid[x+i,y+j] = playerNumber
+
+def unplay(grid, blocks, move):
+    (block_index, num_rot, x, y) = move
+    block_rot= [offset.rotate(num_rot) for offset in blocks[block_index]]
+    for (i,j) in block_rot:
+        grid[x+i,y+j] = -1
+
+# important: block is the already rotated form
+def can_play(grid, playerNumber, block, point):
+
+    N = len(grid)
+
+    onAbsCorner = False
+    onRelCorner = False
+
+    corners = [Point(0, 0), Point(N, 0), Point(N, N), Point(0, N)]
+    corner = corners[playerNumber]
+
+    for offset in block:
+        p = point + offset
+        x = p.x
+        y = p.y
+        if (x > N or x < 0 or y > N or y < 0 or grid[x][y] != -1 or
+            (x > 0 and grid[x - 1][y] == playerNumber) or
+            (y > 0 and grid[x][y - 1] == playerNumber) or
+            (x < N and grid[x + 1][y] == playerNumber) or
+            (y < N and grid[x][y + 1] == playerNumber)
+        ): return False
+
+        onAbsCorner = onAbsCorner or (p == corner)
+        onRelCorner = onRelCorner or (
+            (x > 0 and y > 0 and grid[x - 1][y - 1] == playerNumber) or
+            (x > 0 and y < N and grid[x - 1][y + 1] == playerNumber) or
+            (x < N and y > 0 and grid[x + 1][y - 1] == playerNumber) or
+            (x < N and y < N and grid[x + 1][y + 1] == playerNumber)
+        )
+
+    if grid[corner.x][corner.y] < 0 and not onAbsCorner: return False
+    if not onAbsCorner and not onRelCorner: return False
+
+def get_next_moves(grid, playerNumber, blocks):
+
+    result = []
+    
+    N = len(board)
+    for i in range(N):
+      for j in range(N):
+        for block_index in range(len(blocks)):
+          for r in range(4):
+            block_rot = [offset.rotate(r) for offset in blocks[block_index]]
+            if can_play(grid, playerNumber, block_rot, Point(i,j)):
+              result.append((block_index, r, i, j))
+
+    return result
+
 class Game:
     blocks = []
     grid = []
