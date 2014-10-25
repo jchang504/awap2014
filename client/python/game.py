@@ -37,6 +37,83 @@ class Point:
     def distance(self, point):
         return abs(point.x - self.x) + abs(point.y - self.y)
 
+
+# Given that square (a Point object) is owned by 
+# the player player_number, this function returns all of the
+# squares in the same connected component (or all squares in
+# the same block) as square. The output is a list of Points.
+def connected_squares(square, player_number):
+
+    # Returns list of points on the board adjacent
+    # to point
+    def adjacent_to(point):
+        x = point.x
+        y = point.y
+        adjacent_to_point = []
+        if x + 1 <= 19:
+            adjacent_to_point.append(Point(x+1,y))
+        if x - 1 >= 0:
+            adjacent_to_point.append(Point(x-1,y))
+        if y + 1 <= 19:
+            adjacent_to_point.append(Point(x,y+1))
+        if y - 1 >= 0:
+            adjacent_to_point.append(Point(x,y-1))
+        return adjacent_to_point
+
+    visited = []
+    stack = [square]
+    while len(stack) > 0:
+        top_vertex = stack.pop(len(stack)-1)
+        children = adjacent_to(top_vertex)
+        for child in children:
+            if child not in visited:
+                stack.append(child)
+        visited.append(top_vertex)
+    return visited
+
+
+
+
+
+
+
+
+# Returns the player's score on a given board
+# bonus_squares is list of Points
+# rep invariant: the pieces are arranged according to blokus rules
+# in particular everything reachable from a square in a given block
+# going up, down, left, and right is in the same block
+def score(grid, bonus_squares, player_number):
+    # Find number of squares in blocks containing dogecoins
+    dogecoin_multiplier = 3
+    dogecoin_points_covered_by_player = []
+    for dogecoin_point in bonus_squares:
+        if grid[dogecoin_point.x][dogecoin_point.y] == player_number:
+            dogecoin_points_covered_by_player.append(dogecoin_point)
+
+    return 0
+
+
+    
+
+
+
+
+# Simple heuristic
+# grid is list of lists (20x20) representing the board, with the following entries:
+# -2 - crater
+# -1 - empty
+# 0 - player 1 block
+# 1 - player 2 block
+# 2 - player 3 block
+# 3 - player 4 block
+# Score is linear combination of current score and number of free corners
+def heuristic1(grid, bonus_squares, player_number):
+    a_1 = 1
+    a_2 = 1
+
+    return 0
+
 def play(grid, playerNumber, blocks, move):
     (block_index, num_rot, x, y) = move
     block_rot= [offset.rotate(num_rot) for offset in blocks[block_index]]
@@ -101,6 +178,7 @@ def get_next_moves(grid, playerNumber, blocks):
 
     return result
 
+
 class Game:
     blocks = []
     grid = []
@@ -128,7 +206,7 @@ class Game:
                     if self.can_place(new_block, Point(x, y)):
                         return (index, rotations, x, y)
 
-        return (0, 0, 0, 0)
+        return (0, 0, 0, 0)    
 
     # Checks if a block can be placed at the given point
     def can_place(self, block, point):
@@ -193,14 +271,9 @@ class Game:
         return self.turn == self.my_number
 
 
-# Board heuristic function
-def simon_evaluate(board, player_number):
-    return 0
-
-
 # Minimax search
-def minimax(grid, depth, eval_fn = simon_evaluate,
-        get_next_moves_fn = get_all_next_moves,
+def minimax(grid, bonus_squares, depth, eval_fn = heuristic1, # heuristic1(grid, bonus_squares, player_number):
+        get_next_moves_fn = get_next_moves,
         player_number = 0, verbose = True):
     """
     Do a minimax search to the specified depth on the specified board.
@@ -216,7 +289,7 @@ def minimax(grid, depth, eval_fn = simon_evaluate,
     next_moves = get_next_moves_fn(board, player_number)
 
     if depth == 0: # If at the leaf, evaluate.
-        return (None, [eval_fn(grid, p) for p in range(4)])
+        return (None, [eval_fn(grid, bonus_squares, p) for p in range(4)])
     
     if len(next_moves) == 0: # Can't move anywhere; essentially skips the turn.
         # Evaluate next player's moves
@@ -262,5 +335,9 @@ def main():
         state = get_state()
         game.interpret_data(state)
 
+
+
+
 if __name__ == "__main__":
     main()
+
