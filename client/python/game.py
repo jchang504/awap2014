@@ -37,6 +37,7 @@ class Point:
     def distance(self, point):
         return abs(point.x - self.x) + abs(point.y - self.y)
 
+
 # Given that square (a Point object) is owned by 
 # the player player_number, this function returns all of the
 # squares in the same connected component (or all squares in
@@ -113,6 +114,67 @@ def heuristic1(grid, bonus_squares, player_number):
 
     return 0
 
+def play(grid, playerNumber, blocks, move):
+    (block_index, num_rot, x, y) = move
+    block_rot= [offset.rotate(num_rot) for offset in blocks[block_index]]
+    for (i,j) in block_rot:
+        grid[x+i,y+j] = playerNumber
+
+def unplay(grid, blocks, move):
+    (block_index, num_rot, x, y) = move
+    block_rot= [offset.rotate(num_rot) for offset in blocks[block_index]]
+    for (i,j) in block_rot:
+        grid[x+i,y+j] = -1
+
+# important: block is the already rotated form
+def can_play(grid, playerNumber, block, point):
+
+    N = len(grid)
+
+    onAbsCorner = False
+    onRelCorner = False
+
+    corners = [Point(0, 0), Point(N, 0), Point(N, N), Point(0, N)]
+    corner = corners[playerNumber]
+
+    for offset in block:
+        p = point + offset
+        x = p.x
+        y = p.y
+        if (x > N or x < 0 or y > N or y < 0 or grid[x][y] != -1 or
+            (x > 0 and grid[x - 1][y] == playerNumber) or
+            (y > 0 and grid[x][y - 1] == playerNumber) or
+            (x < N and grid[x + 1][y] == playerNumber) or
+            (y < N and grid[x][y + 1] == playerNumber)
+        ): return False
+
+        onAbsCorner = onAbsCorner or (p == corner)
+        onRelCorner = onRelCorner or (
+            (x > 0 and y > 0 and grid[x - 1][y - 1] == playerNumber) or
+            (x > 0 and y < N and grid[x - 1][y + 1] == playerNumber) or
+            (x < N and y > 0 and grid[x + 1][y - 1] == playerNumber) or
+            (x < N and y < N and grid[x + 1][y + 1] == playerNumber)
+        )
+
+    if grid[corner.x][corner.y] < 0 and not onAbsCorner: return False
+    if not onAbsCorner and not onRelCorner: return False
+
+def get_next_moves(grid, playerNumber, blocks):
+
+    result = []
+    
+    N = len(board)
+    for i in range(N):
+      for j in range(N):
+        for block_index in range(len(blocks)):
+          for r in range(4):
+            block_rot = [offset.rotate(r) for offset in blocks[block_index]]
+            if can_play(grid, playerNumber, block_rot, Point(i,j)):
+              result.append((block_index, r, i, j))
+
+    return result
+
+
 class Game:
     blocks = []
     grid = []
@@ -142,6 +204,7 @@ class Game:
 
         return (0, 0, 0, 0)
 
+<<<<<<< HEAD
     # Minimax search
     def minimax(board, depth, eval_fn = simon_evaluate,
             get_next_moves_fn = get_all_next_moves,
@@ -226,6 +289,58 @@ class Game:
 
     def is_my_turn(self):
         return self.turn == self.my_number
+
+
+# Board heuristic function
+def simon_evaluate(board, player_number):
+    return 0
+
+
+# Minimax search
+def minimax(grid, depth, eval_fn = simon_evaluate,
+        get_next_moves_fn = get_all_next_moves,
+        player_number = 0, verbose = True):
+    """
+    Do a minimax search to the specified depth on the specified board.
+
+    board -- the 2D array board to evaluate. 
+    depth -- the depth of the search tree (measured in maximum distance from a leaf to the root)
+    eval_fn -- the evaluation function to use to give a value to a leaf of the tree
+
+    Returns (move, score). move and score are both 4-tuples. move is what we're interested in
+    """
+    
+    best = None
+    next_moves = get_next_moves_fn(board, player_number)
+
+    if depth == 0: # If at the leaf, evaluate.
+        return (None, [eval_fn(grid, p) for p in range(4)])
+    
+    if len(next_moves) == 0: # Can't move anywhere; essentially skips the turn.
+        # Evaluate next player's moves
+        new_move, new_score = minimax(grid, depth-1, eval_fn, get_next_moves_fn,
+                                        (player_number + 1)%4, verbose)
+        if best == None or new_score[player_number] > best[1][player_number]:
+            best = (move, new_score)
+        
+    for move in next_moves:
+        # Play move. grid should now be a different grid.
+        play(grid, player_number, move)
+
+        # Evaluate next player's moves.
+        new_move, new_score = minimax(grid, depth-1, eval_fn, get_next_moves_fn,
+                                        (player_number + 1)%4, verbose)
+        if best == None or new_score[player_number] > best[1][player_number]:
+            best = (move, new_score)
+
+        # Unplay move. grid should now be back to original.
+        unplay(grid, player_number, move)
+        
+    if verbose:
+        print "MINIMAX: Decided on move %d with rating %d" % (best[0], best[1])
+
+    return best
+
 
 def get_state():
     return json.loads(raw_input())
