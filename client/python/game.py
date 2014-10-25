@@ -196,7 +196,7 @@ def simon_evaluate(board, player_number):
 
 # Minimax search
 def minimax(grid, depth, eval_fn = simon_evaluate,
-        get_next_moves_fn = get_all_next_moves,
+        get_next_moves_fn = get_next_moves,
         player_number = 0, verbose = True):
     """
     Do a minimax search to the specified depth on the specified board.
