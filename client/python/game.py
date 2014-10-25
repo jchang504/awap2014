@@ -84,12 +84,16 @@ def can_play(grid, playerNumber, block, point):
 
 def get_next_moves(grid, playerNumber, blocks):
 
+    # first we create an ordering of the blocks, largest-first
+    indexToLen = enumerate([len(b) for b in blocks])
+    blockIndices = sorted(indexToLen, key=(lambda x : x[1]))
+
     result = []
     
     N = len(board)
     for i in range(N):
       for j in range(N):
-        for block_index in range(len(blocks)):
+        for block_index in blockIndices:
           for r in range(4):
             block_rot = [offset.rotate(r) for offset in blocks[block_index]]
             if can_play(grid, playerNumber, block_rot, Point(i,j)):
