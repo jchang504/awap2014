@@ -209,9 +209,9 @@ class Game:
     # find_move will be called and you must return where to go.
     # You must return a tuple (block index, # rotations, x, y)
     def find_move(self):
-        move, score = minimax(grid, bonus_squares, 4, eval_fn = heuristic1, # heuristic1(grid, bonus_squares, player_number):
+        move, score = minimax(self.grid, self.bonus_squares, 4, eval_fn = heuristic1, # heuristic1(grid, bonus_squares, player_number):
                             get_next_moves_fn = get_next_moves,
-                            player_number = 0, verbose = False)
+                            self.my_number, verbose = False)
         return move
         '''
         moves = []
