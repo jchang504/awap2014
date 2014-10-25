@@ -125,10 +125,9 @@ def score(grid, bonus_squares, player_number):
 # 3 - player 4 block
 # Score is linear combination of current score and number of free corners
 def heuristic1(grid, bonus_squares, player_number):
-    a_1 = 1
-    a_2 = 1
-
-    return 0
+   # a_1 = 1
+   # a_2 = 1
+    return score(grid, bonus_squares, player_number)
 
 def play(grid, playerNumber, blocks, move):
     (block_index, num_rot, x, y) = move
