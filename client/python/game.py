@@ -68,7 +68,7 @@ def connected_squares(square, player_number):
         top_vertex = stack.pop(len(stack)-1)
         children = adjacent_to(top_vertex)
         for child in children:
-            if child not in visited and :
+            if child not in visited:
                 stack.append(child)
         visited.append(top_vertex)
     return visited
@@ -132,14 +132,14 @@ def heuristic1(grid, bonus_squares, player_number):
     current_score = score(grid, bonus_squares, player_number) # some number around 10-50 or so
     num_corners = 0 # some number around 10 or so
 
+'''
     for i in range(40):
         for j in range(40):
             if grid[i][j] == player_number:
                 if all([isEmpty(i+deltaI, j+deltaJ) for deltaI, deltaJ in [(1,0),(-1,0),(0,1),(0,-1)]])
                     if any([isEmpty(i+deltaI, j+deltaJ) for deltaI, deltaJ in [(1,0),(-1,0),(0,1),(0,-1)]])
                         num_corners += 1
-
-    
+'''
     return 0.1 * current_score + num_corners
     
 def isEmpty(i, j, grid):
@@ -150,7 +150,8 @@ def isFilled(i, j, grid, player_number):
 
 def play(grid, playerNumber, blocks, move):
     (block_index, num_rot, x, y) = move
-    removed_block = blocks.pop(block_index)
+    removed_block = blocks[block_index]
+    #removed_block = blocks.pop(block_index)
     block_rot = [offset.rotate(num_rot) for offset in removed_block]
     for (i,j) in block_rot:
         grid[x+i,y+j] = playerNumber
@@ -162,7 +163,7 @@ def unplay(grid, block, point, blocks):
     y = point.y
     for (i,j) in block:
         grid[x+i,y+j] = -1
-    blocks.append(block)
+    #blocks.append(block)
 
 # important: block is the already rotated form
 def can_play(grid, playerNumber, block, point):
