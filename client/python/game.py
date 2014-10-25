@@ -190,6 +190,11 @@ class Game:
     # find_move will be called and you must return where to go.
     # You must return a tuple (block index, # rotations, x, y)
     def find_move(self):
+        move, score = minimax(grid, bonus_squares, 4, eval_fn = heuristic1, # heuristic1(grid, bonus_squares, player_number):
+                            get_next_moves_fn = get_next_moves,
+                            player_number = 0, verbose = False)
+        return move
+        '''
         moves = []
         N = self.dimension
         for index, block in enumerate(self.blocks):
@@ -202,7 +207,7 @@ class Game:
                     if self.can_place(new_block, Point(x, y)):
                         return (index, rotations, x, y)
 
-        return (0, 0, 0, 0)    
+        return (0, 0, 0, 0)  '''  
 
     # Checks if a block can be placed at the given point
     def can_place(self, block, point):
@@ -269,8 +274,8 @@ class Game:
 
 # Minimax search
 def minimax(grid, bonus_squares, depth, eval_fn = heuristic1, # heuristic1(grid, bonus_squares, player_number):
-        get_next_moves_fn = get_next_moves,
-        player_number = 0, verbose = True):
+            get_next_moves_fn = get_next_moves,
+            player_number = 0, verbose = True):
     """
     Do a minimax search to the specified depth on the specified board.
 
