@@ -67,7 +67,7 @@ def connected_squares(square, player_number):
         top_vertex = stack.pop(len(stack)-1)
         children = adjacent_to(top_vertex)
         for child in children:
-            if child not in visited:
+            if child not in visited and :
                 stack.append(child)
         visited.append(top_vertex)
     return visited
@@ -93,11 +93,12 @@ def score(grid, bonus_squares, player_number):
     dogecoin_points_covered_by_player = []
     for dogecoin_point in bonus_squares:
         if grid[dogecoin_point[0]][dogecoin_point[1]] == player_number:
-            dogecoin_points_covered_by_player.append(dogecoin_point)
-
+            #dogecoin_points_covered_by_player.append(dogecoin_point)
+            number_squares_receiving_multiplier += 4 # assume size 4 block
+    '''
     for square in dogecoin_points_covered_by_player: 
         for connected_square in connected_squares(square):
-            number_squares_receiving_multiplier += 1
+            number_squares_receiving_multiplier += 1'''
 
     # Find total number of squares covered by player
     total_player_squares = 0
@@ -107,7 +108,7 @@ def score(grid, bonus_squares, player_number):
                 total_player_squares += 1
 
     # Compute final score 
-    return dogecoin_multiplier*number_squares_receiving_multiplier + (total_player_squares - number_squares_receiving_multiplier)
+    return (dogecoin_multiplier - 1)*number_squares_receiving_multiplier + (total_player_squares - number_squares_receiving_multiplier)
 
 
     
@@ -127,7 +128,15 @@ def score(grid, bonus_squares, player_number):
 def heuristic1(grid, bonus_squares, player_number):
    # a_1 = 1
    # a_2 = 1
-    return score(grid, bonus_squares, player_number)
+    current_score = score(grid, bonus_squares, player_number) # some number around 10-50 or so
+    num_corners = 0 # some number around 10 or so
+
+    for i in range(40):
+        for j in range(40):
+            pass
+
+    return 0.1 * current_score + num_corners
+    
 
 def play(grid, playerNumber, blocks, move):
     (block_index, num_rot, x, y) = move
